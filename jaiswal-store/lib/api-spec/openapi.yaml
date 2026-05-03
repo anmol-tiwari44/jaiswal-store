@@ -1,0 +1,398 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: Jaiswal Store API specification
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: products
+    description: Product operations
+  - name: shop
+    description: Shop settings operations
+  - name: auth
+    description: Auth operations
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /products:
+    get:
+      operationId: listProducts
+      tags: [products]
+      summary: List all products
+      responses:
+        "200":
+          description: List of products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Product"
+    post:
+      operationId: createProduct
+      tags: [products]
+      summary: Create a product (admin only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateProductBody"
+      responses:
+        "201":
+          description: Product created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "401":
+          description: Unauthorized
+
+  /products/{id}:
+    get:
+      operationId: getProduct
+      tags: [products]
+      summary: Get a product by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Product
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "404":
+          description: Not found
+    put:
+      operationId: updateProduct
+      tags: [products]
+      summary: Update a product (admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateProductBody"
+      responses:
+        "200":
+          description: Updated product
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteProduct
+      tags: [products]
+      summary: Delete a product (admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+        "401":
+          description: Unauthorized
+
+  /products/stats:
+    get:
+      operationId: getProductStats
+      tags: [products]
+      summary: Get product statistics
+      responses:
+        "200":
+          description: Product stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductStats"
+
+  /shop:
+    get:
+      operationId: getShopSettings
+      tags: [shop]
+      summary: Get shop settings
+      responses:
+        "200":
+          description: Shop settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ShopSettings"
+    put:
+      operationId: updateShopSettings
+      tags: [shop]
+      summary: Update shop settings (admin only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateShopSettingsBody"
+      responses:
+        "200":
+          description: Updated shop settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ShopSettings"
+        "401":
+          description: Unauthorized
+
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Admin login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginBody"
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+        "401":
+          description: Invalid credentials
+
+  /auth/logout:
+    post:
+      operationId: logout
+      tags: [auth]
+      summary: Admin logout
+      responses:
+        "200":
+          description: Logged out
+
+  /auth/me:
+    get:
+      operationId: getMe
+      tags: [auth]
+      summary: Get current session info
+      responses:
+        "200":
+          description: Session info
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SessionInfo"
+
+  /auth/change-credentials:
+    post:
+      operationId: changeCredentials
+      tags: [auth]
+      summary: Change admin credentials (admin only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChangeCredentialsBody"
+      responses:
+        "200":
+          description: Credentials updated
+        "401":
+          description: Unauthorized
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+
+    Product:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        price:
+          type: number
+        discount:
+          type: number
+        imageUrl:
+          type: string
+          nullable: true
+        finalPrice:
+          type: number
+        savings:
+          type: number
+      required:
+        - id
+        - name
+        - price
+        - discount
+        - finalPrice
+        - savings
+
+    CreateProductBody:
+      type: object
+      properties:
+        name:
+          type: string
+        price:
+          type: number
+        discount:
+          type: number
+        imageUrl:
+          type: string
+          nullable: true
+      required:
+        - name
+        - price
+        - discount
+
+    UpdateProductBody:
+      type: object
+      properties:
+        name:
+          type: string
+        price:
+          type: number
+        discount:
+          type: number
+        imageUrl:
+          type: string
+          nullable: true
+      required:
+        - name
+        - price
+        - discount
+
+    ProductStats:
+      type: object
+      properties:
+        totalProducts:
+          type: integer
+        onDiscount:
+          type: integer
+        avgDiscount:
+          type: number
+        lowestPrice:
+          type: number
+          nullable: true
+        highestPrice:
+          type: number
+          nullable: true
+      required:
+        - totalProducts
+        - onDiscount
+        - avgDiscount
+
+    ShopSettings:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        phone:
+          type: string
+          nullable: true
+        address:
+          type: string
+          nullable: true
+      required:
+        - id
+        - name
+
+    UpdateShopSettingsBody:
+      type: object
+      properties:
+        name:
+          type: string
+        phone:
+          type: string
+          nullable: true
+        address:
+          type: string
+          nullable: true
+      required:
+        - name
+
+    LoginBody:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      required:
+        - username
+        - password
+
+    LoginResponse:
+      type: object
+      properties:
+        username:
+          type: string
+        message:
+          type: string
+      required:
+        - username
+        - message
+
+    SessionInfo:
+      type: object
+      properties:
+        isAdmin:
+          type: boolean
+        username:
+          type: string
+          nullable: true
+      required:
+        - isAdmin
+
+    ChangeCredentialsBody:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      required:
+        - username
+        - password

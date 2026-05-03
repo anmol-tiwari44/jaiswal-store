@@ -1,0 +1,14 @@
+{
+  "name": "jaiswal-store",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "pnpm --filter @workspace/jaiswal-store run build && pnpm --filter @workspace/api-server run build",
+    "start": "node artifacts/api-server/dist/index.mjs",
+    "db:setup": "node scripts/setup-db.mjs"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
