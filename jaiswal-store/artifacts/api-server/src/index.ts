@@ -1,10 +1,28 @@
 import app from "./app";
 import { logger } from "./lib/logger";
-import { db, usersTable } from "@workspace/db";
+import { pool, db, usersTable } from "@workspace/db";
 import bcrypt from "bcryptjs";
 
 async function setupDatabase() {
   try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        username TEXT NOT NULL UNIQUE,
+        password_hash TEXT NOT NULL
+      );
+      CREATE TABLE IF NOT EXISTS products (
+        id SERIAL PRIMARY KEY,
+        name TEXT NOT NULL,
+        description TEXT,
+        price NUMERIC NOT NULL,
+        discount_percent NUMERIC DEFAULT 0,
+        image_url TEXT,
+        category TEXT,
+        in_stock BOOLEAN DEFAULT true,
+        created_at TIMESTAMP DEFAULT NOW()
+      );
+    `);
     const users = await db.select().from(usersTable).limit(1);
     if (users.length === 0) {
       const hash = await bcrypt.hash("admin123", 10);
