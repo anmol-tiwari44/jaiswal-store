@@ -32,6 +32,15 @@ CREATE TABLE IF NOT EXISTS shop (
       await db.insert(usersTable).values({ username: "admin", passwordHash: hash });
       logger.info("Admin user created: username=admin password=admin123");
     }
+    // Create default shop if not exists
+const { rows: shops } = await pool.query("SELECT id FROM shop LIMIT 1");
+if (shops.length === 0) {
+  await pool.query(
+    "INSERT INTO shop (name, phone, address) VALUES ($1, $2, $3)",
+    ["Jaiswal Store", "", ""]
+  );
+  logger.info("Default shop created");
+}
   } catch (err) {
     logger.error({ err }, "Database setup failed");
   }
