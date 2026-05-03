@@ -1,32 +1,18 @@
 import app from "./app";
 import { logger } from "./lib/logger";
-import pg from "pg";
-import bcrypt from "bcrypt";
+import { db, usersTable } from "@workspace/db";
+import bcrypt from "bcryptjs";
 
 async function setupDatabase() {
-  const client = new pg.Client({ connectionString: process.env.DATABASE_URL });
   try {
-    await client.connect();
-    await client.query(`
-      CREATE TABLE IF NOT EXISTS users (
-        id SERIAL PRIMARY KEY,
-        username TEXT NOT NULL UNIQUE,
-        password_hash TEXT NOT NULL
-      );
-    `);
-    const { rows } = await client.query("SELECT id FROM users LIMIT 1");
-    if (rows.length === 0) {
+    const users = await db.select().from(usersTable).limit(1);
+    if (users.length === 0) {
       const hash = await bcrypt.hash("admin123", 10);
-      await client.query(
-        "INSERT INTO users (username, password_hash) VALUES ($1, $2)",
-        ["admin", hash]
-      );
+      await db.insert(usersTable).values({ username: "admin", passwordHash: hash });
       logger.info("Admin user created: username=admin password=admin123");
     }
   } catch (err) {
     logger.error({ err }, "Database setup failed");
-  } finally {
-    await client.end();
   }
 }
 
