@@ -19,6 +19,12 @@ CREATE TABLE products (
   discount REAL NOT NULL DEFAULT 0,
   image_url TEXT
 );
+CREATE TABLE IF NOT EXISTS shop (
+  id SERIAL PRIMARY KEY,
+  name TEXT NOT NULL,
+  phone TEXT,
+  address TEXT
+);
     `);
     const users = await db.select().from(usersTable).limit(1);
     if (users.length === 0) {
