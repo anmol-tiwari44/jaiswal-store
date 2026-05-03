@@ -12,16 +12,12 @@ async function setupDatabase() {
         password_hash TEXT NOT NULL
       );
       CREATE TABLE IF NOT EXISTS products (
-        id SERIAL PRIMARY KEY,
-        name TEXT NOT NULL,
-        description TEXT,
-        price NUMERIC NOT NULL,
-        discount_percent NUMERIC DEFAULT 0,
-        image_url TEXT,
-        category TEXT,
-        in_stock BOOLEAN DEFAULT true,
-        created_at TIMESTAMP DEFAULT NOW()
-      );
+      id SERIAL PRIMARY KEY,
+       name TEXT NOT NULL,
+       price REAL NOT NULL,
+       discount REAL NOT NULL DEFAULT 0,
+       image_url TEXT
+     );
     `);
     const users = await db.select().from(usersTable).limit(1);
     if (users.length === 0) {
