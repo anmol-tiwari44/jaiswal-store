@@ -11,13 +11,14 @@ async function setupDatabase() {
         username TEXT NOT NULL UNIQUE,
         password_hash TEXT NOT NULL
       );
-      CREATE TABLE IF NOT EXISTS products (
-      id SERIAL PRIMARY KEY,
-       name TEXT NOT NULL,
-       price REAL NOT NULL,
-       discount REAL NOT NULL DEFAULT 0,
-       image_url TEXT
-     );
+     DROP TABLE IF EXISTS products;
+CREATE TABLE products (
+  id SERIAL PRIMARY KEY,
+  name TEXT NOT NULL,
+  price REAL NOT NULL,
+  discount REAL NOT NULL DEFAULT 0,
+  image_url TEXT
+);
     `);
     const users = await db.select().from(usersTable).limit(1);
     if (users.length === 0) {
